@@ -22,4 +22,3 @@ Not only are you able to get high accuracy faster with max pooling, but it seems
 I added a softmax activation to the output layer in place of sigmoid. I do not believe any changes to the back prop algorithm were necessary because the derivative of the softmax is the same as the sigmoid when the indices of the inputs and outputs are equal. I am a bit confused because I'm not sure when they wouldn't be equal. 2d array? Anyway, this had a couple of effects. First, I was able to achieve a higher accuracy. Second, pooling no longer seemed to work as well. Here's the highest accuracy I was able to achieve. Notice the time spent training was about the time it took to achieve the best results with pooling:
 
 ![200_7](https://github.com/mc25573/ANN_mnist/blob/master/images/100_softmax.PNG)
-![200_7](https://github.com/mc25573/ANN_mnist/blob/master/images/200_7.JPG)
