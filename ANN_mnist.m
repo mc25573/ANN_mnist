@@ -37,11 +37,11 @@ clearvars -except tr sub trIdx target i iTest targetTest targetsMNIST
 format compact
 format long
 
-h_num = 200;                                 %number of hidden neurons per hidden layer                          
+h_num = 90;                                 %number of hidden neurons per hidden layer                          
 hid_w = .25*rand(h_num,size(i,1))-1/8;       %weights, rand(2,2): [w1 w2;w3 w4;w5 w6]
 out_w = .25*rand(size(target,1),h_num)-1/8;  %weights of connections from hidden to output layer
-n = .5;                                      %learning rate
-epoch = 40;                                   %number of times the entire test data set is trained
+n = .4;                                      %learning rate
+epoch = 35;                                   %number of times the entire test data set is trained
 newHid_w = hid_w;
 newOut_w = out_w;
 i_size=size(i,1);
@@ -53,12 +53,12 @@ for j=1:epoch
     %col randomizes the order in which the inputs are fed through the ANN  
     col = randperm(length(i));   
     for k=1:length(i)
-        out_w = newOut_w;
+        out_w = newOut_w;        
         %forward pass
         hin = newHid_w * i(:,col(k));
         hout = sigmoid(hin);
         outin = newOut_w * hout;
-        out_out = sigmoid(outin);
+        out_out = softmax(outin);
         error = .5 .* (target(:,col(k)) - out_out).^2;        
         
         %track error for plotting 
@@ -76,12 +76,13 @@ for j=1:epoch
 
         %hidden layer back pass
         h_back = out_w' * dEtot_dneto;    
-        delta_h = h_back .* sig_deriv(hout) * i(:,col(k))';
+        delta_h = (h_back .* sig_deriv(hout)) * i(:,col(k))';
         
         %new weights of hidden layer
         newHid_w = newHid_w - n .* delta_h;  
     end    
 end
+disp('Training Time: ')
 toc
 beep
 %% TEST
@@ -93,7 +94,7 @@ for p=1:length(sub)
     hin = newHid_w * iTest(:,p);
     hout = sigmoid(hin);
     outin = newOut_w * hout;
-    out_out = sigmoid(outin);
+    out_out = softmax(outin);
     errorTest = .5 .* (targetTest(:,p) - out_out).^2;
     errorYTest(p)=sum(errorTest);
     [M,I]=max(targetTest(:,p));
@@ -107,6 +108,14 @@ for p=1:length(sub)
         conf(t) = round(N,2);
     end    
 end
+disp('Inputs: ')
+disp(i_size)
+disp('Hidden Neurons: ')
+disp(h_num)
+disp('Learning Rate: ')
+disp(n)
+disp('Epochs: ')
+disp(epoch)
 percentCorrect=correct/length(sub)*100
 %% PLOT ERROR AND WEIGHTS
 figure
@@ -134,7 +143,7 @@ for c = 1:25                                    % preview first 25 samples
     digit = reshape(sub(wrongIdx(c), 2:end), [28,28])'; % reshape to 28 x 28 image
     imagesc(digit)                              % show the image
     pbaspect([1 1 1])                           % square aspect ratio
-    title(['Actual:' num2str(sub(wrongIdx(c), 1)) ' ' 'Guess:' num2str(guess(c)) ' ' 'Conf:' num2str(conf(c))]) % show the labels
+    title(['Actual:' num2str(sub(wrongIdx(c), 1)) ' ' 'Guess:' num2str(guess(c)) ' ' 'Prob:' num2str(conf(c))]) % show the labels
 end
 %% PLOT TRAINING IMAGES
 figure
